@@ -80,28 +80,28 @@ to cover the falling animation).
 
 ## 配置 Configuration
 
-`BepInEx\config\gk2.toggleinteract.cfg`
+`BepInEx\config\gk2.toggleinteract.cfg` —— 只有一个开关：
 
 ```ini
 [1. General 总开关]
+## 是否启用。判据是「该动作会不会显示进度条」——会显示进度条的动作
+## （砍树 / 挖矿 / 施工 / 制作 / 种植 / 施肥 / 打水 …）会被持续化；
+## 开门、开箱、拿取这类没有进度条的动作不受影响。
+## 设为 false 时行为完全等同原版，无需卸载。
 Enabled = true
-
-[2. Stop rules 停止判定]
-IdleTimeoutMs = 3500        # 离开工作状态多久后收手
-LostTargetGraceMs = 2500    # 目标消失后待命多久（等下一形态）
-AnchorRadius = 2.5          # 同一资源点允许的最大偏移
-
-[3. Diagnostics 诊断]
-Verbose = true              # 记录详细日志，稳定后可关
 ```
 
 | 键 Key | 说明 Description |
 |---|---|
-| `Enabled` | `false` 时插件完全不生效，行为等同原版。`false` disables the plugin entirely. |
-| `IdleTimeoutMs` | 被界面 / 剧情打断后，多久判定为结束。How long out of the work state before giving up. |
-| `LostTargetGraceMs` | 目标消失后保持待命多久，用来等树桩之类的下一形态出现。Standby time waiting for the next form. |
-| `AnchorRadius` | 判定"同一个资源点"时允许的最大偏移（配合资源族名使用）。Max offset for "same resource node". |
-| `Verbose` | 输出 `[probe]` 之类的诊断日志。Diagnostic logging. |
+| `Enabled` | `false` 时插件完全不生效，行为等同原版，无需卸载。`false` disables the plugin entirely, no uninstall needed. |
+
+其余时序参数（收手延迟、待命时长、同格判定半径等）都写在代码里的常量，
+不需要也不应该让用户调 —— 少一个旋钮就少一种"调坏了"的可能。
+需要改的话改 `ToggleInteractPlugin.cs` 顶部的 `*Const` 常量再重新编译。
+
+Other timing values (release delays, standby time, same-node radius) are compile-time
+constants in `ToggleInteractPlugin.cs` instead of config entries - fewer knobs, fewer ways
+to misconfigure. Edit the `*Const` fields there and rebuild if you really need to.
 
 ---
 

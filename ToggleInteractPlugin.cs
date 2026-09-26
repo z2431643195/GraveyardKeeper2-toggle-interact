@@ -81,11 +81,15 @@ namespace ToggleInteract
 
         internal static ToggleInteractPlugin Instance;
 
+        /// <summary>配置里唯一的开关。</summary>
         internal static ConfigEntry<bool> Enabled;
-        internal static ConfigEntry<float> IdleTimeoutMs;
-        internal static ConfigEntry<float> LostTargetGraceMs;
-        internal static ConfigEntry<float> AnchorRadius;
-        internal static ConfigEntry<bool> Verbose;
+
+        // ---- 内部参数：不暴露到配置文件，需要时改这里重新编译 ----
+        // Internal tuning values: not exposed in the config file, change here and rebuild.
+        private const float IdleSecondsConst = 3.5f;             // 离开工作状态多久后收手
+        private const float LostTargetGraceSecondsConst = 2.5f;  // 目标消失后待命多久（等下一形态）
+        private const float RadiusConst = 2.5f;                  // 同一资源点允许的最大偏移
+        private const bool VerboseConst = false;                 // 详细诊断日志
 
         internal static bool WorkActive;              // 是否正在维持持续工作
         internal static int ActionKeyId = 101;        // GameKey.Action 的数值
@@ -107,36 +111,9 @@ namespace ToggleInteract
                     "是否启用。判据是「该动作会不会显示进度条」——会显示进度条的动作" +
                     "（砍树 / 挖矿 / 施工 / 制作 / 种植 / 施肥 / 打水 …）会被持续化；" +
                     "开门、开箱、拿取这类没有进度条的动作不受影响。\n" +
-                    "Enable the mod. Any action that shows a progress bar is made continuous.");
-
-                IdleTimeoutMs = Config.Bind("2. Stop rules 停止判定", "IdleTimeoutMs", 3500f,
-                    new ConfigDescription(
-                        "离开工作状态持续多久（毫秒）后自动停止（被界面、剧情、控制锁定打断时用）。\n" +
-                        "Auto-stop after being out of the work state for this many ms.",
-                        new AcceptableValueRange<float>(500f, 20000f)));
-
-                LostTargetGraceMs = Config.Bind("2. Stop rules 停止判定", "LostTargetGraceMs", 2500f,
-                    new ConfigDescription(
-                        "目标消失后，保持待命多久（毫秒）才真正收手。\n" +
-                        "待命期里按键大部分时间是松开的（玩家能自由走动，不会卡手），" +
-                        "插件只在其中周期性短暂按一下，用来让游戏重新寻找下一形态。\n" +
-                        "这个值只决定「等下一形态等多久」：树倒下到树桩出现、矿脉换形态都在这个范围内；" +
-                        "等满了仍无目标（真挖空/砍完）才收手。想更早收手可调小。\n" +
-                        "How long to stay on standby waiting for the next form.",
-                        new AcceptableValueRange<float>(200f, 8000f)));
-
-                AnchorRadius = Config.Bind("2. Stop rules 停止判定", "AnchorRadius", 2.5f,
-                    new ConfigDescription(
-                        "转化判定里允许的最大偏移（结合资源族名一起用）：\n" +
-                        "· 位置几乎没动（<=0.15）            -> 同一资源点的转化，继续\n" +
-                        "· 资源族名相同且距离 <= 本值        -> 同一资源点的转化，继续\n" +
-                        "· 其余                              -> 视为旁边的另一个资源，停止\n" +
-                        "实测树 -> 树桩会挪 1.4 左右，所以默认给到 2.5（约 2 格）。\n" +
-                        "Max offset for treating a new target as the same resource node transforming.",
-                        new AcceptableValueRange<float>(0.1f, 10f)));
-
-                Verbose = Config.Bind("3. Diagnostics 诊断", "Verbose", true,
-                    "记录按键、命中与目标变化（排查用，稳定后可关）。\nLog keys, matches and target changes.");
+                    "设为 false 时行为完全等同原版，无需卸载。\n" +
+                    "Enable the mod. Any action that shows a progress bar is made continuous.\n" +
+                    "Set to false to behave exactly like vanilla, no uninstall needed.");
 
                 int actionId = KeyId(GameKey.Action);
                 if (actionId >= 0) ActionKeyId = actionId;
@@ -183,16 +160,13 @@ namespace ToggleInteract
             }
         }
 
-        internal static float IdleSeconds =>
-            IdleTimeoutMs != null ? IdleTimeoutMs.Value / 1000f : 3.5f;
+        internal static float IdleSeconds => IdleSecondsConst;
 
-        internal static float LostTargetGraceSeconds =>
-            LostTargetGraceMs != null ? LostTargetGraceMs.Value / 1000f : 0.5f;
+        internal static float LostTargetGraceSeconds => LostTargetGraceSecondsConst;
 
-        internal static float Radius =>
-            AnchorRadius != null ? AnchorRadius.Value : 3f;
+        internal static float Radius => RadiusConst;
 
-        internal static bool VerboseMode => Verbose == null || Verbose.Value;
+        internal static bool VerboseMode => VerboseConst;
 
         internal static void Log(string message) => Instance?.Logger.LogInfo(message);
         internal static void LogError(string message) => Instance?.Logger.LogError(message);

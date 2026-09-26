@@ -72,21 +72,15 @@ node, never wandering to a neighbour.
 
 Configuration 配置说明
 ----------------------
+配置文件里只有一个开关 / The config file has a single switch:
+
 [1. General 总开关]
-  Enabled            false 时本 mod 完全不生效，行为等同原版。
-                     false makes the mod a no-op, behaving exactly like vanilla.
+  Enabled    是否启用。false 时本 mod 完全不生效，行为等同原版，无需卸载。
+             Enable the mod. false makes it a complete no-op, exactly like
+             vanilla - no uninstall needed.
 
-[2. Stop rules 停止判定]
-  IdleTimeoutMs      被界面 / 剧情打断后，多久判定为结束（毫秒）。
-                     How long out of the work state before giving up (ms).
-  LostTargetGraceMs  目标消失后保持待命多久（毫秒），用来等树桩之类的下一形态出现。
-                     Standby time waiting for the next form to appear (ms).
-  AnchorRadius       判定「同一个资源点」时允许的最大偏移。
-                     Max offset when deciding "same resource node".
-
-[3. Diagnostics 诊断]
-  Verbose            true 时输出 [probe] 之类的诊断日志，稳定后可关。
-                     Diagnostic logging; turn off once things work for you.
+其余时序参数（收手延迟、待命时长、同格判定半径等）是代码里的常量，不需要调。
+Other timing values are compile-time constants; nothing else to tune.
 
 
 Notes 说明

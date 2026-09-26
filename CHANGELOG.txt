@@ -28,6 +28,11 @@ v1.0.0  (2026-09-26)
     Three ways to break out: move input, pressing the work key again, or
     pressing the interact key (that interaction still goes through).
   - 配置文件与日志为中英双语。Bilingual (CN/EN) config comments and logs.
+  - 配置文件只保留一个总开关（Enabled），其余时序参数（收手延迟、待命时长、
+    同格判定半径、诊断日志）均为代码内常量，使用者无需调节。
+    The config file exposes a single switch (Enabled). All other timing values
+    (release delays, standby time, same-node radius, diagnostics) are
+    compile-time constants, so there is nothing to misconfigure.
 
 
 开发过程 / Development notes
