@@ -2,7 +2,7 @@
 
   <!-- 游戏路径：可用 -p:GameDir="..." 覆盖 -->
   <PropertyGroup>
-    <GameDir Condition=" '$(GameDir)' == '' ">E:\Graveyard Keeper 2</GameDir>
+    <GameDir Condition=" '$(GameDir)' == '' ">E:\Graveyard.Keeper.2.v1.006</GameDir>
     <ManagedDir>$(GameDir)\GraveyardKeeper2_Data\Managed\</ManagedDir>
     <BepInExCoreDir>$(GameDir)\BepInEx\core\</BepInExCoreDir>
     <PluginsDir>$(GameDir)\BepInEx\plugins\</PluginsDir>
@@ -18,8 +18,8 @@
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS0436;NU1701;MSB3277</NoWarn>
 
-    <Version>1.0.1</Version>
-    <FileVersion>1.0.1</FileVersion>
+    <Version>1.0.2</Version>
+    <FileVersion>1.0.2</FileVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <Product>Toggle Interact</Product>
     <Authors>z2431643195</Authors>

@@ -19,6 +19,7 @@ A BepInEx plugin for **Graveyard Keeper 2** that turns single-press work actions
 | 再按一下同一个键 | 停止 |
 | 推摇杆 / 按 WASD | 停止（想走就走，不会被锁住） |
 | 按交互键 | 停止，并且这次交互**立即生效**，可以直接选下一个操作 |
+| **按功能键**（暂停 / 角色 / 科技树 / 任务 / 地图 / 灵感 / `Tab` / `Esc`） | **对应界面照常打开**，同时停止持续化 |
 
 In vanilla, chopping, mining, crafting etc. all need repeated key presses. With this plugin:
 
@@ -28,6 +29,7 @@ In vanilla, chopping, mining, crafting etc. all need repeated key presses. With 
 | Press the same key again | Stop |
 | Move the stick / press WASD | Stop (you are never locked in place) |
 | Press the interact key | Stop, and that interaction **still goes through**, so you can pick the next action right away |
+| **Press a function key** (pause / character / tech tree / quests / map / inspirations / `Tab` / `Esc`) | The **matching window opens as usual**, and the continuous work stops |
 
 ### 覆盖范围 Coverage
 
@@ -53,6 +55,26 @@ Trees turn into stumps, ore nodes into the next form — the plugin keeps going 
 target is gone too, and it only follows **the same resource node**, never wandering to a neighbour.
 When the work is actually finished it releases automatically (resource-type targets get a 2 s window
 to cover the falling animation).
+
+### 功能键照常可用 Function keys keep working
+
+持续化工作中按 **暂停 / 角色 / 科技树 / 任务 / 地图 / 灵感 / `Tab` / `Esc`**：
+
+- **界面照常打开**（该开哪个就开哪个，页签解没解锁也由游戏自己判断）
+- 同时**停止持续化**
+- 关掉界面后**立刻**可以重新开始持续化，不用等
+
+原理：干活期间游戏把玩家输入整体跳过了（读输入的状态在 `ByWork` 暂停下 `IsActive = false`），
+所以这一次按键会被丢掉。插件在你按下时先收手，再**把这次按键递回给游戏**——
+开界面这件事完全由游戏自己做，插件不复制任何界面逻辑。
+
+**哪个键对应哪个功能，直接读游戏自己的键位绑定**（`LazyInput.GameBindings`），
+所以你在游戏设置里改了键，插件也自动跟着变，不存在"写死键位"。
+
+While the work is running, pressing **pause / character / tech tree / quests / map / inspirations /
+`Tab` / `Esc`** still opens the matching window and stops the continuous work. The key→action
+mapping is read from the game's own bindings, so custom key bindings follow automatically.
+The plugin never re-implements the game's window logic — it just hands the key back to the game.
 
 ---
 
@@ -80,7 +102,7 @@ to cover the falling animation).
 
 ## 配置 Configuration
 
-`BepInEx\config\gk2.toggleinteract.cfg` —— 只有一个开关：
+`BepInEx\config\gk2.toggleinteract.cfg` —— 一共两项，**第二项通常不用动**：
 
 ```ini
 [1. General 总开关]
@@ -89,11 +111,17 @@ to cover the falling animation).
 ## 开门、开箱、拿取这类没有进度条的动作不受影响。
 ## 设为 false 时行为完全等同原版，无需卸载。
 Enabled = true
+
+[2. 功能键映射 / Function key map]
+## 通常留空。键位对应关系直接读游戏自己的设置，改键也会自动跟随。
+RawButtonToGameKey =
+KeyboardKeyToGameKey =
 ```
 
 | 键 Key | 说明 Description |
 |---|---|
 | `Enabled` | `false` 时插件完全不生效，行为等同原版，无需卸载。`false` disables the plugin entirely, no uninstall needed. |
+| `RawButtonToGameKey`<br>`KeyboardKeyToGameKey` | **通常留空即可**。持续化工作中按功能键（暂停 / 角色 / 科技树 / 地图 …）时，插件需要知道"你按的是哪个键"才能把这次按键递回给游戏；这个对应关系**直接读游戏自己的键位绑定**，所以你在游戏设置里改键也会自动跟随。这两项只用于手工覆盖（格式 `键位=GameKey名`，多个用逗号分隔）。<br>Leave empty. The key→GameKey mapping is read from the game's own bindings, so custom key bindings follow automatically. Use these only to override manually. |
 
 其余时序参数（收手延迟、待命时长、同格判定半径等）都写在代码里的常量，
 不需要也不应该让用户调 —— 少一个旋钮就少一种"调坏了"的可能。
@@ -133,6 +161,13 @@ Nothing is written to your save file, so it can be removed at any time.
   资源类目标给 2 秒窗口覆盖倒地动画，其它类型 0.4 秒快速收手。
 - **脱身**：原生输入检测移动意图（`LazyInput.GetDirection` + `Input.GetAxisRaw`）；
   按交互键时先解除持续，再用一个短窗口把这次交互键**补还**给游戏，避免"按 A 被吞一次"。
+- **功能键**（暂停 / 角色 / 科技树 / 任务 / 地图 / 灵感 / `Tab` / `Esc`）：
+  键位对应关系从 `LazyInput.GameBindings` 的 `keyBindings` / `gamepadBindings` 读取，
+  不做任何硬编码；干活期间 `PlayerInputHandler.UpdateInput()` 所在玩家状态的
+  `IsActive => IsControlsEnabled` 被 `ByWork` 压成 false，整段按键处理不会执行，
+  所以插件先收手、再把那次 GameKey 伪造回去（让 `GetKeyDown` 返回一次 true），
+  **由游戏自己打开界面**。这类收手走 `StopForUi()`，会清掉两个防抖标记，
+  保证关掉界面后可以立刻重新持续化。
 
 ---
 

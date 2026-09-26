@@ -1,5 +1,5 @@
 param(
-    [string]$GameDir = "E:\Graveyard Keeper 2"
+    [string]$GameDir = "E:\Graveyard.Keeper.2.v1.006"
 )
 
 $ErrorActionPreference = "Stop"

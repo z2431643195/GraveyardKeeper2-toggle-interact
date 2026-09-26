@@ -1,6 +1,43 @@
 Changelog / 更新日志
 ==============================================
 
+v1.0.2  (2026-09-27)
+--------------------
+新增 / New
+  - 持续化工作中按功能键（暂停 / 角色 / 科技树 / 任务 / 地图 / 灵感 / Tab / Esc）
+    时，对应界面照常打开，同时停止持续化。
+    Pressing a function key (pause / character / tech tree / quests / map /
+    inspirations / Tab / Esc) while working now opens the matching window as
+    usual and stops the continuous work.
+  - 键位对应关系直接读游戏自己的键位绑定（LazyInput.GameBindings），
+    在游戏设置里改键也会自动跟随，插件不硬编码任何键位。
+    The key->action mapping is read from the game's own bindings, so custom key
+    bindings follow automatically. No key is hard-coded.
+  - 配置新增可选的「功能键映射」小节，仅在需要手工覆盖时填写。
+    An optional "Function key map" config section was added; it only needs
+    attention when you want to override manually.
+
+修复 / Fixes
+  - 关掉界面后可以「立刻」重新开始持续化，不再需要等一段时间（收手时残留的
+    防抖标记会挡住重新接管）。
+    Continuous work can be restarted immediately after closing a window;
+    leftover anti-retrigger flags used to block re-taking over.
+  - 修掉一个把刚读到的键位绑定表清空的错误，它会让手柄功能键只停止持续化、
+    不打开任何界面。
+    Fixed a bug that wiped the freshly loaded key binding table, making gamepad
+    function keys stop the work without opening a window.
+
+说明 / Notes
+  - 界面完全由游戏自己打开，插件只把那次按键递回给游戏，不复制任何界面逻辑
+    （包括"页签有没有解锁"这类判断），因此不存在按错键弹错窗口的情况。
+    The window is opened by the game itself; the plugin only hands the key back
+    and never re-implements window logic.
+  - 已实测：键盘 I / T / P / Q / M / Tab / Esc 与手柄 Back / Start 全部生效；
+    移动、同键取消、交互键、界面接管、材料不足、资源不足等收手路径均正常。
+    Verified: all keys above, plus every release path (move input, same key,
+    interact key, UI takeover, missing materials, not enough energy).
+
+
 v1.0.1  (2026-09-26)
 --------------------
 修复 / Fixes

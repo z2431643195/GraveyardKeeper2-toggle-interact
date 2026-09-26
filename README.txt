@@ -47,6 +47,11 @@ the spot and starts automatically). Press the same key again -> stop.
   - 按交互键（并且这次交互会立即生效，可直接选下一个操作）
     Press the interact key (that interaction still goes through, so you can pick
     the next action right away)
+  - 按功能键（暂停 / 角色 / 科技树 / 任务 / 地图 / 灵感 / Tab / Esc）
+    对应界面会照常打开，同时停止持续化；关掉界面后可以立刻重新开始
+    Press a function key (pause / character / tech tree / quests / map /
+    inspirations / Tab / Esc): the matching window opens as usual and the work
+    stops; you can start working again as soon as you close it
 
 
 覆盖范围 Coverage
@@ -72,12 +77,21 @@ node, never wandering to a neighbour.
 
 Configuration 配置说明
 ----------------------
-配置文件里只有一个开关 / The config file has a single switch:
+配置文件里一共两项，第二项通常不用动 / The config has two entries; the second one
+normally needs no attention:
 
 [1. General 总开关]
   Enabled    是否启用。false 时本 mod 完全不生效，行为等同原版，无需卸载。
              Enable the mod. false makes it a complete no-op, exactly like
              vanilla - no uninstall needed.
+
+[2. 功能键映射 / Function key map]
+  RawButtonToGameKey / KeyboardKeyToGameKey
+             通常留空。键位对应关系直接读游戏自己的设置，改键也会自动跟随；
+             这两项只用于手工覆盖。格式：键位=GameKey名，多个用逗号分隔。
+             Leave empty. The key->action mapping is read from the game's own
+             bindings, so custom key bindings follow automatically. Use these
+             only to override manually (format: key=GameKeyName, comma separated).
 
 其余时序参数（收手延迟、待命时长、同格判定半径等）是代码里的常量，不需要调。
 Other timing values are compile-time constants; nothing else to tune.
