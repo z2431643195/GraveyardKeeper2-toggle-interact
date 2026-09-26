@@ -1,0 +1,18 @@
+# 构建产物 Build output
+bin/
+obj/
+release/
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.userprefs
+
+# 临时文件 Temp
+*.tmp
+*.log
+Thumbs.db
+Desktop.ini

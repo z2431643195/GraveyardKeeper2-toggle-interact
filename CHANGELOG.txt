@@ -1,0 +1,46 @@
+Changelog / 更新日志
+==============================================
+
+v1.0.0  (2026-09-26)
+--------------------
+首个公开发布版本。First public release.
+
+功能 / Features
+  - 按一下工作键即持续干活，再按一下停止。
+    Press the work key once to keep working, press again to stop.
+  - 判据是「动作是否显示进度条」，因此自动覆盖砍树、挖矿、挖黏土 / 沙、耕地、
+    收割、打水、施肥、种植、坟墓、制作台、纺车与各类工作站。
+    The rule is "does the action show a progress bar", so chopping, mining,
+    clay / sand digging, tilling, harvesting, water, fertilizing, planting,
+    graves, crafting stations and the spinning wheel are all covered.
+  - 开门、开箱、拿取 / 放置、检查、建造窗口不受影响。
+    Doors, chests, take / put, inspect and the building window are untouched.
+  - 形态转化自动衔接（树 -> 树桩、矿脉 -> 下一形态），且只跟随同一个资源点，
+    不会跑去挖旁边的资源。
+    Form transitions follow through (tree -> stump, ore -> next form) and only
+    track the same resource node.
+  - 干活走完（进度条归零）后自动收手；资源类目标等 2 秒以覆盖倒地动画，
+    其它类型 0.4 秒收手。
+    Releases automatically when the progress bar finishes: 2 s for resource
+    targets (falling animation), 0.4 s for everything else.
+  - 三种随时脱身方式：推摇杆 / WASD、再按工作键、按交互键（且该次交互会立即
+    生效，不会被吞掉）。
+    Three ways to break out: move input, pressing the work key again, or
+    pressing the interact key (that interaction still goes through).
+  - 配置文件与日志为中英双语。Bilingual (CN/EN) config comments and logs.
+
+
+开发过程 / Development notes
+----------------------------
+公开版本从 1.0.0 起算。开发期间的内部迭代（1.0 ~ 24.0）主要围绕以下几点：
+  - 定位正确的接管入口：必须挂在 WorkPlayerState.OnEnter，而不是
+    WGOInteractionHandlerBase.Interact2（按工作键时状态机直接进状态，
+    不经过任何 handler 方法）。
+  - 形态转化判定：从「按目标 ID 变化停止」→「按同一格距离」→ 最终改为
+    「资源族名 + 偏移上限」，避免把树桩误判成结束、把小树误判成延续。
+  - 脱身与卡手：加入移动意图检测、交互键补还、以及干完自动收手。
+
+The public version starts at 1.0.0. Internal iterations during development
+(1.0 - 24.0) were about picking the right hook point, making form transitions
+follow through without wandering to neighbouring nodes, and keeping the player
+from ever getting stuck in the work state.

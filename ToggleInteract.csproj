@@ -1,0 +1,72 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- 游戏路径：可用 -p:GameDir="..." 覆盖 -->
+  <PropertyGroup>
+    <GameDir Condition=" '$(GameDir)' == '' ">E:\Graveyard Keeper 2</GameDir>
+    <ManagedDir>$(GameDir)\GraveyardKeeper2_Data\Managed\</ManagedDir>
+    <BepInExCoreDir>$(GameDir)\BepInEx\core\</BepInExCoreDir>
+    <PluginsDir>$(GameDir)\BepInEx\plugins\</PluginsDir>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>ToggleInteract</AssemblyName>
+    <RootNamespace>ToggleInteract</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS0436;NU1701;MSB3277</NoWarn>
+
+    <Version>1.0.0</Version>
+    <FileVersion>1.0.0</FileVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <Product>Toggle Interact</Product>
+    <Authors>z2431643195</Authors>
+    <Company>z2431643195</Company>
+    <Copyright>Copyright © 2026 z2431643195</Copyright>
+    <Description>Turns single-press interactions into a toggled auto-repeat in Graveyard Keeper 2.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>$(BepInExCoreDir)0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>$(BepInExCoreDir)BepInEx.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(ManagedDir)Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>$(ManagedDir)Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="LazyBearTechnology">
+      <HintPath>$(ManagedDir)LazyBearTechnology.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(ManagedDir)UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(ManagedDir)UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- Unity 6 起 UnityEngine.Input 被移到 legacy 模块 -->
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>$(ManagedDir)UnityEngine.InputLegacyModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="CopyToPlugins" AfterTargets="Build">
+    <Message Importance="high" Text="正在拷贝到游戏插件目录: $(PluginsDir)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PluginsDir)" Condition="Exists('$(PluginsDir)')" />
+  </Target>
+
+</Project>
