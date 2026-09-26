@@ -1,6 +1,19 @@
 Changelog / 更新日志
 ==============================================
 
+v1.0.1  (2026-09-26)
+--------------------
+修复 / Fixes
+  - 兼容 Graveyard Keeper 2 v1.006：获取 PlayerController 改为安全访问，
+    修掉新版上每帧抛一次空引用的问题（会刷爆日志并影响性能）。
+    Compatibility with GK2 v1.006: PlayerController is now accessed through a
+    guarded helper, fixing a per-frame NullReferenceException on that build.
+  - 异常日志改为输出完整堆栈并限流，便于定位问题。
+    Exception logging now includes the full stack trace and is rate-limited.
+  - 已实测：1.004.3 与 1.006 两个版本上均无报错，24 个第三方 mod 共存正常。
+    Verified on both v1.004.3 and v1.006 with 24 other plugins loaded.
+
+
 v1.0.0  (2026-09-26)
 --------------------
 首个公开发布版本。First public release.

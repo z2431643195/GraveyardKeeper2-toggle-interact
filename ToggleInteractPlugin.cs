@@ -77,7 +77,7 @@ namespace ToggleInteract
     {
         public const string PluginGuid = "gk2.toggleinteract";
         public const string PluginName = "Toggle Interact";
-        public const string PluginVersion = "1.0.0";
+        public const string PluginVersion = "1.0.1";
 
         internal static ToggleInteractPlugin Instance;
 
@@ -674,12 +674,14 @@ namespace ToggleInteract
         private bool _hasWorked;      // 是否真正开工过（进度条走过），用于放行「走过去」的寻路阶段
         private float _hpZeroSince;   // 目标 HP 归零的时刻（用于判断「这一次的活干完了」）
         private float _nextProbe;
+        private int _errorBudget = 5;   // 异常日志限流（带上堆栈，只报前几次）
 
         private void Update()
         {
             try
             {
-                if (ToggleInteractPlugin.Instance == null || !ToggleInteractPlugin.Enabled.Value) return;
+                if (ToggleInteractPlugin.Instance == null) return;
+                if (ToggleInteractPlugin.Enabled == null || !ToggleInteractPlugin.Enabled.Value) return;
 
                 ScanNativeInput();
 
@@ -737,7 +739,7 @@ namespace ToggleInteract
                 }
 
                 // ---------- 2. 玩家状态 ----------
-                PlayerController pc = MainGame.PlayerController;
+                PlayerController pc = SafeController();
                 object cur = null;
                 try { cur = pc != null ? pc.Ssm.CurState : null; } catch { }
                 string stateName = cur != null ? cur.GetType().Name : string.Empty;
@@ -938,7 +940,12 @@ namespace ToggleInteract
             }
             catch (Exception ex)
             {
-                ToggleInteractPlugin.LogError("behaviour error: " + ex.Message);
+                // 只报前几次，避免每帧刷屏；带上完整堆栈，便于定位是 1.006 里哪个 API 变了
+                if (_errorBudget > 0)
+                {
+                    _errorBudget--;
+                    ToggleInteractPlugin.LogError("behaviour error: " + ex);
+                }
             }
         }
 
@@ -1100,9 +1107,20 @@ namespace ToggleInteract
         {
             try
             {
-                PlayerController pc = MainGame.PlayerController;
+                PlayerController pc = SafeController();
                 return pc != null ? ToggleInteractPlugin.ReadMember(pc, "PlayerWorkComponent") : null;
             }
+            catch { return null; }
+        }
+
+        /// <summary>
+        /// 安全取 PlayerController。
+        /// 它是 `MainGame.PlayerController => Instance.playerController`，
+        /// 内部若 MainGame 实例还没就绪就会抛空引用，所以不能裸调。
+        /// </summary>
+        private static PlayerController SafeController()
+        {
+            try { return MainGame.PlayerController; }
             catch { return null; }
         }
 
